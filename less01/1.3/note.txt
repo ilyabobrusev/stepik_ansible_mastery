@@ -1,0 +1,62 @@
+
+Команды для проверки:
+
+    Показать структуру:
+
+ansible-inventory -i inventory.ini --graph
+
+    Показать полный список:
+
+ansible-inventory -i inventory.ini --list
+
+    Проверить подключение:
+
+ansible all -i inventory.ini -m ping
+
+
+
+Пример структуры проекта с inventory
+
+project/
+├── ansible.cfg
+├── inventory/
+│   ├── dev.ini
+│   └── prod.ini
+├── playbook.yml
+
+Файл ansible.cfg:
+
+[defaults]
+inventory = ./inventory/dev.ini
+
+
+
+Примеры запуска
+
+Если у вас inventory лежит в подкаталоге inventory/, и вы не указали это в ansible.cfg, то в командах необходимо указывать путь:
+
+    Выполнить ping для dev окружения:
+
+ansible all -i inventory/dev.ini -m ping
+
+    Запустить playbook для prod:
+
+ansible-playbook -i inventory/prod.ini playbook.yml
+
+    Проверить структуру inventory:
+
+ansible-inventory -i inventory/prod.ini --graph
+
+Если путь задан в ansible.cfg (будет рассмотрен далее), можно запускать короче:
+
+ansible all -m ping
+ansible-playbook playbook.yml
+
+
+
+Полезные ссылки
+
+    https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html
+
+    https://docs.ansible.com/ansible/latest/cli/ansible-inventory.html
+
