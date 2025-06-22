@@ -1,0 +1,7 @@
+---
+- name: "Проверка соединения"
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: "Проверка соединения"
+      ansible.builtin.ping:

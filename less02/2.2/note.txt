@@ -1,0 +1,8 @@
+ansible-playbook -i inventory.ini playbook.yaml
+
+# "Проверка соединения" – Двойные кавычки позволяют использовать escape-последовательности (\n, \t и т. д.) и подстановку переменных ({{ var_name }}).
+# 'Проверка соединения' – Одинарные кавычки воспринимают строку буквально, без интерполяции переменных и escape-последовательностей.
+
+
+ansible-playbook -i inventory.ini webserver.yaml --check
+ansible-playbook -i inventory.ini webserver.yaml
