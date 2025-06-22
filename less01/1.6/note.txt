@@ -1,0 +1,64 @@
+# Установка коллекций
+
+Установка через Ansible Galaxy (официальный репозиторий):
+ansible-galaxy collection install community.general
+
+Можно указывать версию:
+ansible-galaxy collection install community.general:3.8.0
+
+По умолчанию:
+~/.ansible/collections/ — для пользователя
+или в collections/ внутри проекта (если настроен ansible.cfg)
+
+- name: Клонировать git-репозиторий
+  community.general.git:
+    repo: https://...
+
+
+# Коллекции могут содержать роли, которые ты подключаешь так:
+- hosts: all
+  roles:
+    - role: nginx
+      collections:
+        - mycompany.web
+
+Или через requirements.yml:
+collections:
+  - name: community.general
+  - name: ansible.posix
+
+Затем установить:
+ansible-galaxy install -r requirements.yml
+
+
+# Примеры коллекций
+ansible-galaxy collection install community.general
+ansible-galaxy collection install community.docker
+ansible-galaxy collection install amazon.aws
+ansible-galaxy collection install kubernetes.core
+
+https://galaxy.ansible.com/ui/
+ansible-galaxy search community
+
+
+# equirements.yml
+
+collections:
+  - name: community.general         # универсальные модули: git, cron, ini_file, hostname и др.
+    version: ">=6.0.0"
+
+  - name: community.docker          # работа с docker_container, docker_image и т.п.
+    version: ">=3.0.0"
+
+  - name: amazon.aws                # управление AWS: EC2, S3, IAM, RDS
+    version: ">=6.0.0"
+
+  - name: kubernetes.core           # работа с объектами Kubernetes
+    version: ">=2.4.0"
+
+  - name: ansible.posix             # SELinux, sysctl, firewalld и другие POSIX-утилиты
+    version: ">=1.5.0"
+
+ansible-galaxy collection install -r requirements.yml
+
+Коллекции будут установлены в ~/.ansible/collections/ или в локальный путь проекта, если настроено через ansible.cfg
