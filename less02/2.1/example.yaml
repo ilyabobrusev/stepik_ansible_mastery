@@ -1,0 +1,72 @@
+# Простой словарь (map)
+person:
+  name: Alice         # строка
+  age: 28             # целое число
+  height: 1.68        # число с плавающей точкой
+  is_active: true     # булево значение
+  nickname: null      # null можно записать как null, ~ или оставить пустым
+
+# Последовательность (список)
+fruits:
+  - apple
+  - banana
+  - orange
+
+# Вложенные словари и списки
+server:
+  name: web01
+  ip: 192.168.1.100
+  roles:
+    - web
+    - app
+  metadata:
+    os: Ubuntu
+    version: "22.04"  # строка в кавычках
+
+# Список словарей
+users:
+  - username: admin
+    uid: 0
+    groups:
+      - root
+      - wheel
+  - username: john
+    uid: 1001
+    groups:
+      - users
+      - developers
+
+# Многострочные строки
+description_literal: |
+  Это многострочная строка.
+  Каждая строка сохраняется с переносом.
+  Полезно для логов и длинных описаний.
+
+description_folded: >
+  Это тоже многострочная строка,
+  но она будет слита в одну строку
+  с пробелами вместо переносов.
+
+# Ссылки и якори
+defaults: &defaults
+  retries: 3
+  timeout: 30
+
+service1:
+  <<: *defaults
+  name: backend
+
+service2:
+  <<: *defaults
+  name: frontend
+
+# Многодокументный YAML (реже используется в Ansible, но допустим)
+---
+file: /etc/app/config.yaml
+mode: "0644"
+owner: root
+group: root
+content: |
+  log_level: debug
+  max_connections: 100
+...
