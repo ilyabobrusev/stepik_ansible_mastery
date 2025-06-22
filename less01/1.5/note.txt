@@ -1,0 +1,66 @@
+# Базовая структура проекта
+
+project/
+├── ansible.cfg
+├── inventory/
+│   ├── dev.ini
+│   └── prod.ini
+├── playbook.yml
+
+
+# Расширенная структура: инфраструктурные и прикладные роли
+
+project/
+├── ansible.cfg
+├── inventory/
+│   ├── dev/
+│   │   └── hosts.ini
+│   └── prod/
+│       └── hosts.ini
+├── playbooks/
+│   ├── site.yml
+│   └── webservers.yml
+├── group_vars/
+│   ├── all.yml
+│   └── webservers.yml
+├── host_vars/
+│   └── web1.yml
+├── roles/
+│   ├── nginx/
+│   │   ├── tasks/
+│   │   ├── handlers/
+│   │   ├── templates/
+│   │   ├── files/
+│   │   ├── vars/
+│   │   └── defaults/
+│   └── postgres/
+└── requirements.yml
+
+ansible-galaxy install -r requirements.yml
+
+
+# Пример: .gitlab-ci.yml
+# Флаги --limit, --tags, --check
+
+deploy:
+  script:
+    - ansible-playbook -i inventory/prod/hosts.ini playbooks/site.yml --check
+
+
+# Проверка проекта
+
+    Проверить список хостов:
+
+ansible all -m ping
+
+    Запустить основной playbook:
+
+ansible-playbook playbooks/site.yml
+
+    Проверить структуру inventory:
+
+ansible-inventory -i inventory/dev/hosts.ini --graph
+
+    Проверить настройки Ansible:
+
+ansible --version
