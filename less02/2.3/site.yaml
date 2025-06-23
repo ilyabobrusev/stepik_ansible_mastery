@@ -1,0 +1,28 @@
+- name: Демонстрация работы с переменными
+  hosts: all
+  gather_facts: false
+
+  vars_files:
+    - vars.yaml
+
+  tasks:
+
+    - name: Создать пользователя
+      ansible.builtin.user:
+        name: "{{ username }}"
+        home: "{{ home_dir }}"
+
+    - name: Проверить, существует ли домашняя директория
+      ansible.builtin.stat:
+        path: "{{ home_dir }}"
+      register: home_check
+
+    - name: Установить факт с приветственным сообщением
+      ansible.builtin.set_fact:
+        welcome_msg: >-
+          {{ welcome_prefix }} {{ username }},
+          домашняя директория {{ 'существует' if home_check.stat.exists else 'не найдена' }}
+
+    - name: Вывести сообщение
+      ansible.builtin.debug:
+        msg: "{{ welcome_msg }}"

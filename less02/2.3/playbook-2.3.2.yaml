@@ -1,0 +1,42 @@
+---
+- name: Регистрация и вывод переменных
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Проверить, есть ли /etc
+      ansible.builtin.stat:
+        path: /etc
+      register: etc_check
+
+    - name: Установить факт о платформе
+      ansible.builtin.set_fact:
+        is_debian: "{{ ansible_distribution == 'Debian' }}"
+
+    - name: Печать сведений
+      ansible.builtin.debug:
+        msg: |
+          /etc существует? {{ etc_check.stat.exists }}
+          OS = {{ ansible_distribution }}
+          Debian? {{ is_debian }}
+
+    - name: Вывод структуры данных
+      ansible.builtin.debug:
+        msg: "{{ {'key1': 'value1', 'key2': 42, 'key3': [1, 2, 3]} }}"
+
+    - name: Показать IP-адрес
+      ansible.builtin.debug:
+        msg: "{{ ansible_default_ipv4.address }}"
+
+    - name: Проверить, существует ли файл
+      ansible.builtin.stat:
+        path: /etc/important.conf
+      register: file_info
+
+    - name: Установить флаг
+      ansible.builtin.set_fact:
+        file_status: "{{ 'Найден' if file_info.stat.exists else 'Не найден' }}"
+
+    - name: Вывод результата
+      ansible.builtin.debug:
+        msg: "Файл /etc/important.conf: {{ file_status }}"

@@ -1,0 +1,33 @@
+- name: Демонстрация условий в playbook
+  hosts: all
+  gather_facts: true
+
+  vars:
+    create_file: true
+
+  tasks:
+
+    - name: Установить htop, если это Ubuntu
+      ansible.builtin.apt:
+        name: htop
+        state: present
+        update_cache: true
+      when: ansible_distribution == "Ubuntu"
+
+    - name: Создать файл, если переменная разрешает
+      ansible.builtin.file:
+        path: /tmp/test.txt
+        state: touch
+        mode: "0644"
+      when: create_file
+
+    - name: Проверить, существует ли файл
+      ansible.builtin.stat:
+        path: /tmp/test.txt
+      register: file_status
+
+    - name: Удалить файл, если он существует
+      ansible.builtin.file:
+        path: /tmp/test.txt
+        state: absent
+      when: file_status.stat.exists

@@ -1,0 +1,30 @@
+---
+- name: Main playbook-2.3
+  hosts: all
+  vars:
+    username: alice
+  vars_files:
+    - vars/main.yaml
+
+  tasks:
+    - name: Create user
+      ansible.builtin.user:
+        name: "{{ username }}"
+        home: "{{ home_dir }}"
+
+    - name: Check if a file exists
+      ansible.builtin.stat:
+        path: "{{ home_dir }}"
+      register: file_info
+
+    - name: Print file mode
+      ansible.builtin.debug:
+        msg: "File mode is {{ file_info.stat.mode }}"
+
+    - name: Set fact value
+      ansible.builtin.set_fact:
+        hello_name: "Hello {{ username }}"
+
+    - name: Print hello
+      ansible.builtin.debug:
+        msg: "{{ hello_name }}"
