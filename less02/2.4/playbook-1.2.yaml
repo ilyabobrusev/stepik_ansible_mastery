@@ -1,0 +1,41 @@
+- name: Пример использования циклов в Ansible
+  hosts: all
+  gather_facts: true
+
+  vars:
+    packages:
+      - htop
+      - curl
+      - git
+
+    users:
+      - name: alice
+        uid: 1001
+      - name: bob
+        uid: 1002
+      - name: carol
+        uid: 1003
+
+  tasks:
+
+    - name: Установить список пакетов
+      ansible.builtin.apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: true
+      loop: "{{ packages }}"
+      when: ansible_os_family == "Debian"
+
+    - name: Создать пользователей
+      ansible.builtin.user:
+        name: "{{ item.name }}"
+        uid: "{{ item.uid }}"
+        state: present
+      loop: "{{ users }}"
+
+    - name: Вывести отчёт с индексом
+      ansible.builtin.debug:
+        msg: "Пользователь №{{ idx }}: {{ item.name }} (UID: {{ item.uid }})"
+      loop: "{{ users }}"
+      loop_control:
+        index_var: idx

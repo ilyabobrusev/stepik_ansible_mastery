@@ -1,0 +1,35 @@
+---
+- name: Demo loop
+  hosts: all
+
+  tasks:
+    - name: Установить пакеты
+      ansible.builtin.apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - htop
+        - curl
+        - git
+
+    - name: Создать пользователей
+      ansible.builtin.user:
+        name: "{{ item.name }}"
+        uid: "{{ item.uid }}"
+      loop:
+        - { name: "alice", uid: 1001 }
+        - { name: "bob", uid: 1002 }
+      loop_control:
+        index_var: current_index
+        label: "Пользователь {{ item.name }} (итерация {{ current_index + 1 }})"
+
+    - name: Добавить пользователей, если активны
+      ansible.builtin.user:
+        name: "{{ item.name }}"
+      loop:
+        - { name: "john", active: true }
+        - { name: "mike", active: false }
+      when: item.active
+      loop_control:
+        extended: true
+        label: "Пользователь {{ item.name }} (итерация {{ ansible_loop.index0 + 1 }})"
