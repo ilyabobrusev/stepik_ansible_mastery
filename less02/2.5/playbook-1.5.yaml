@@ -1,0 +1,16 @@
+---
+- name: changed_when
+  hosts: all
+
+  tasks:
+    - name: Запрос uptime
+      ansible.builtin.shell: "uptime"
+
+    - name: Запрос uptime
+      ansible.builtin.shell: "uptime"
+      register: uptime_result
+      changed_when: false
+
+    - name: Вывести отчёт сообщение 
+      ansible.builtin.debug:
+        msg: "Система работает: {{ uptime_result.stdout }}"

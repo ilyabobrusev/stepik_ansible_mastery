@@ -1,0 +1,22 @@
+---
+- name: changed_when failed_when
+  hosts: all
+
+
+  tasks:
+
+    - name: Получить список процессов
+      ansible.builtin.shell: "ps aux"
+      register: ps_result
+      changed_when: false
+
+    - name: Симулировать изменение
+      ansible.builtin.debug:
+        msg: "Действие выполнено"
+      changed_when: true
+
+    - name: Проверка curl и фиксация изменения при 404
+      ansible.builtin.shell: "curl -s -o /dev/null -w '%{http_code}' https://example.com/404"
+      register: response
+      failed_when: false
+      changed_when: response.stdout != "200"

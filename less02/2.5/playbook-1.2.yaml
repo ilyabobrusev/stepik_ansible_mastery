@@ -1,0 +1,15 @@
+---
+- name: failed_when
+  hosts: all
+
+  tasks:
+    - name: Попробовать найти слово в файле
+      ansible.builtin.shell: "grep 'ERROR' /var/log/syslog"
+      register: grep_result
+      failed_when: false
+
+    - name: Проверить, есть ли 'FAILED' в выводе
+      ansible.builtin.command: "echo 'Build status: OK'"
+      register: echo_result
+      failed_when: "'FAILED' in echo_result.stdout"
+

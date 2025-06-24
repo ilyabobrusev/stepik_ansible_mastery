@@ -1,0 +1,29 @@
+---
+- name: Демонстрация block/rescue/always
+  hosts: all
+  gather_facts: false
+
+  tasks:
+
+    - name: Выполнить действия с защитой от сбоев
+      block:
+        - name: Создать временный файл
+          ansible.builtin.shell: "touch /tmp/myfile"
+
+        - name: Сломать задачу
+          ansible.builtin.shell: "exit 1"
+
+      rescue:
+        - name: Удалить файл в случае сбоя
+          ansible.builtin.file:
+            path: /tmp/myfile
+            state: absent
+
+        - name: Сообщить об ошибке
+          ansible.builtin.debug:
+            msg: "Что-то пошло не так, откат выполнен."
+
+      always:
+        - name: Финальное сообщение
+          ansible.builtin.debug:
+            msg: "Завершение блока — вне зависимости от успеха или ошибки."

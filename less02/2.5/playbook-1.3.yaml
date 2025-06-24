@@ -1,0 +1,15 @@
+---
+- name: failed_when
+  hosts: all
+
+
+  tasks:
+
+    - name: Отправить запрос на страницу, которой не существует
+      ansible.builtin.shell: "curl -s -o /dev/null -w '%{http_code}' https://example.com/404"
+      register: curl_result
+      failed_when: false  # не считать ошибкой
+
+    - name: Вывести код ответа curl
+      ansible.builtin.debug:
+        msg: "Код ответа: {{ curl_result.stdout }}"

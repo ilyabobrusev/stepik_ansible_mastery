@@ -1,0 +1,12 @@
+---
+- name: Ignore fail
+  hosts: all
+
+  tasks:
+    - name: Выполнить команду, которая может завершиться ошибкой
+      ansible.builtin.shell: "ls /nonexistent"
+      ignore_errors: true
+
+    - name: Вывести отчёт сообщение 
+      ansible.builtin.debug:
+        msg: "Команда выполнена"
