@@ -1,0 +1,18 @@
+---
+
+- name: Пример import_tasks и include_tasks по ОС
+  hosts: localhost
+  gather_facts: true
+
+  tasks:
+
+    - name: Задачи, выполняемые всегда (import)
+      ansible.builtin.import_tasks: common.yml
+
+    - name: Задачи только для Debian
+      ansible.builtin.include_tasks: debian.yml
+      when: ansible_os_family == "Debian"
+
+    - name: Задачи только для RedHat
+      ansible.builtin.include_tasks: redhat.yml
+      when: ansible_os_family == "RedHat"

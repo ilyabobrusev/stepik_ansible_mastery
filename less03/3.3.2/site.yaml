@@ -1,0 +1,21 @@
+---
+
+- name: Подключение нескольких файлов с переменными
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+
+    - name: Загрузить все переменные
+      ansible.builtin.include_vars: "{{ item }}"
+      loop:
+        - vars/network.yml
+        - vars/database.yml
+        - vars/users.yml
+
+    - name: Проверка доступа к переменным
+      ansible.builtin.debug:
+        msg:
+          - "Сеть: {{ net_gateway }}"
+          - "БД: {{ db_name }} на {{ db_host }}"
+          - "Пользователь по умолчанию: {{ default_user }}"

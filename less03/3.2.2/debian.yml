@@ -1,0 +1,5 @@
+---
+
+- name: Специфичная задача для Debian
+  ansible.builtin.debug:
+    msg: "Вы используете Debian или Ubuntu"

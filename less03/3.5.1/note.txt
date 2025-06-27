@@ -1,0 +1,3 @@
+ansible-playbook site.yaml --tags install
+ansible-playbook site.yaml --skip-tags config
+ansible-playbook site.yaml --tags install,notify --skip-tags config

@@ -1,0 +1,65 @@
+- name: Пример "боевого" playbook с этапами
+  hosts: webservers
+  become: true
+  gather_facts: true
+
+  vars:
+    deploy_tmp_path: /tmp/deploy-nginx
+    notify_email: "devops@example.com"
+
+  pre_tasks:
+
+    - name: Проверка, что система Debian-based
+      ansible.builtin.fail:
+        msg: "Этот playbook работает только с Debian/Ubuntu"
+      when: ansible_os_family != "Debian"
+
+    - name: Создать временный каталог
+      ansible.builtin.file:
+        path: "{{ deploy_tmp_path }}"
+        state: directory
+        mode: '0755'
+
+    - name: Скачать индексный файл (для примера)
+      ansible.builtin.get_url:
+        url: "https://example.com/index.html"
+        dest: "{{ deploy_tmp_path }}/index.html"
+        mode: "0644"
+
+  tasks:
+
+    - name: Установить nginx
+      ansible.builtin.apt:
+        name: nginx
+        state: present
+        update_cache: true
+
+    - name: Копировать index.html в /var/www/html
+      ansible.builtin.copy:
+        src: "{{ deploy_tmp_path }}/index.html"
+        dest: /var/www/html/index.html
+        owner: www-data
+        group: www-data
+        mode: '0644'
+        remote_src: true
+
+    - name: Убедиться, что nginx запущен
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: true
+
+  post_tasks:
+
+    - name: Удалить временный каталог
+      ansible.builtin.file:
+        path: "{{ deploy_tmp_path }}"
+        state: absent
+
+    - name: Вывести лог об окончании
+      ansible.builtin.debug:
+        msg: "✅ Деплой завершён. Nginx запущен."
+
+    - name: Симулировать отправку уведомления на email
+      ansible.builtin.debug:
+        msg: "Отправлено письмо на {{ notify_email }}"

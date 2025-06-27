@@ -1,0 +1,21 @@
+- name: Пример pre_tasks и post_tasks
+  hosts: all
+  gather_facts: true  # нужно для определения дистрибутива
+
+  pre_tasks:
+    - name: Подготовка — начало деплоя
+      ansible.builtin.debug:
+        msg: "🟡 Начинаем деплой приложения"
+
+  tasks:
+    - name: Установить htop (только на Debian-системах)
+      ansible.builtin.apt:
+        name: htop
+        state: present
+        update_cache: true
+      when: ansible_os_family == "Debian"
+
+  post_tasks:
+    - name: Завершение — всё готово!
+      ansible.builtin.debug:
+        msg: "✅ Деплой завершён успешно"

@@ -1,0 +1,12 @@
+---
+- name: Пример "боевого" playbook с этапами
+  hosts: webservers
+  become: true
+  gather_facts: true
+
+  tasks:
+    - name: Установить Nginx
+      ansible.builtin.apt:
+        name: nginx
+        state: present
+      tags: install

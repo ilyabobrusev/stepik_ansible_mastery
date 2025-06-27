@@ -1,0 +1,5 @@
+---
+
+- name: Сообщение из always.yml
+  ansible.builtin.debug:
+    msg: "Этот блок импортирован через import_tasks и выполняется всегда."

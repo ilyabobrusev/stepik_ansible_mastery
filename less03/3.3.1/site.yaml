@@ -1,0 +1,20 @@
+---
+
+- name: Подключение переменных по ОС
+  hosts: localhost
+  gather_facts: true
+
+  tasks:
+
+    - name: Определить файл с переменными
+      ansible.builtin.set_fact:
+        vars_file: "vars/{{ ansible_os_family | lower }}.yml"
+
+    - name: Загрузить переменные по ОС
+      ansible.builtin.include_vars:
+        file: "{{ vars_file }}"
+        name: distro
+
+    - name: Показать настройки для ОС
+      ansible.builtin.debug:
+        msg: "Для ОС {{ ansible_os_family }} используем пакет {{ distro.pkg_name }}"

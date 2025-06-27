@@ -1,0 +1,17 @@
+---
+
+- name: Пример include_tasks и import_tasks
+  hosts: all
+  gather_facts: false
+
+  vars:
+    use_setup: true
+
+  tasks:
+
+    - name: Статический импорт (всегда)
+      ansible.builtin.import_tasks: always.yaml
+
+    - name: Условный include (по переменной)
+      ansible.builtin.include_tasks: optional.yaml
+      when: use_setup

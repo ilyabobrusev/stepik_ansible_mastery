@@ -1,0 +1,5 @@
+---
+
+- name: Специфичная задача для RedHat
+  ansible.builtin.debug:
+    msg: "Вы используете RedHat или производную"
