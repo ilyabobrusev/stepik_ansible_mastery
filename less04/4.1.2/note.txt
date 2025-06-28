@@ -1,0 +1,4 @@
+ansible-galaxy install geerlingguy.nginx
+ansible-galaxy install geerlingguy.nginx -p roles
+
+Это работает с import_tasks, но не с include_role — тот подключает всё

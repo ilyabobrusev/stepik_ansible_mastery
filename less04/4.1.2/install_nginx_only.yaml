@@ -1,0 +1,17 @@
+---
+
+- name: Установить только nginx из роли
+  hosts: webservers
+  become: true
+  gather_facts: true
+
+  vars:
+    nginx_install_from_packages: true
+    nginx_package_name: nginx
+    nginx_ppa_version: stable
+    nginx_ppa_use: false
+
+  tasks:
+
+    - name: Подключить задачу установки nginx
+      ansible.builtin.import_tasks: roles/geerlingguy.nginx/tasks/setup-Ubuntu.yml

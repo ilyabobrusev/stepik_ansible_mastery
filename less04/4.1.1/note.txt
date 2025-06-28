@@ -1,0 +1,121 @@
+Пример структуры роли (roles/nginx/)
+
+roles/
+└── nginx/
+    ├── tasks/
+    │   └── main.yml          # Что делать
+    ├── handlers/
+    │   └── main.yml          # Что делать, если что-то изменилось
+    ├── templates/
+    │   └── nginx.conf.j2     # Jinja2 шаблоны
+    ├── files/
+    │   └── index.html        # Просто файлы
+    ├── vars/
+    │   └── main.yml          # Жёсткие переменные
+    ├── defaults/
+    │   └── main.yml          # Значения по умолчанию (гибкие)
+    └── meta/
+        └── main.yml          # Зависимости и метаданные
+
+Как использовать роль в playbook?
+
+- name: Установка и настройка nginx
+  hosts: web
+  become: true
+
+  roles:
+    - nginx
+
+
+https://galaxy.ansible.com доступны тысячи готовых ролей:
+
+Примеры популярных:
+    geerlingguy.nginx — установка и настройка Nginx
+    geerlingguy.mysql
+    dev-sec.ssh-hardening
+    cloudalchemy.prometheus
+
+Эти роли можно скачать и использовать как зависимости в своём проекте — это как NPM/Bundler/Composer, только для инфраструктуры:
+
+ansible-galaxy install geerlingguy.nginx
+
+
+
+roles:
+  - role: mycompany.common
+    vars:
+      ntp_server: time.corp.local
+      users:
+        - name: admin
+          ssh_key: ...
+
+
+Роль может вызывать другие роли (зависимости)
+# roles/myapp/meta/main.yml
+dependencies:
+  - role: geerlingguy.nginx
+  - role: postgresql
+
+
+Роль можно вызывать с переменными на лету
+roles:
+  - role: nginx
+    vars:
+      nginx_listen_port: 8080
+
+
+Использование tags внутри роли
+Можно задавать теги внутри задач роли, и потом запускать только нужные части роли:
+- name: Установить nginx
+  apt:
+    name: nginx
+    state: present
+  tags: install
+
+
+Роли и окружения (dev / prod / stage)
+С помощью переменных из инвентаря, group_vars, host_vars, можно вызывать одну и ту же роль с разным поведением:
+# group_vars/prod.yml
+nginx_listen_port: 80
+# group_vars/dev.yml
+nginx_listen_port: 8080
+
+
+Тестирование ролей с Molecule
+Роль — это модуль, а значит её можно тестировать в изоляции, не разворачивая всю инфраструктуру:
+pip install molecule
+molecule init role nginx
+molecule test
+
+
+Распространение и публикация ролей
+Ты можешь выложить свою роль в:
+    Ansible Galaxy (ansible-galaxy import)
+    GitHub/GitLab и подключать по ссылке:
+
+- src: git+https://github.com/myorg/ansible-role-nginx.git
+  version: main
+  name: nginx
+
+
+Как использовать не всю роль, а только нужные её части
+Способ 1: import_tasks или include_tasks из роли вручную
+- name: Установить только nginx из роли
+  hosts: web
+  become: true
+
+  tasks:
+
+    - name: Импортировать установку из роли geerlingguy.nginx
+      import_tasks: roles/geerlingguy.nginx/tasks/install.yml
+
+
+Способ 2: Использовать tags, но вызывать всю роль
+Если роль уже грамотно размечена тегами (install, config, service), ты можешь вызвать всю роль, но запустить только нужные части:
+ansible-playbook site.yml --tags install
+Это работает, если в tasks/main.yml внутри роли теги уже прописаны:
+- name: Установка nginx
+  apt:
+    name: nginx
+    state: present
+  tags: install
