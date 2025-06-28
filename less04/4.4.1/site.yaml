@@ -1,0 +1,14 @@
+---
+
+- name: Собрать только нужные факты с хоста
+  hosts: db1
+  gather_facts: true
+
+  tasks:
+
+    - name: Вывести системную информацию
+      ansible.builtin.debug:
+        msg:
+#          - "hostvars: {{ hostvars. }}"
+          - "groups: {{ groups }}"
+          - "inventory_hostname: {{ inventory_hostname }}"

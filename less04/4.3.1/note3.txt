@@ -1,0 +1,40 @@
+Подключение ролей
+
+Метод 	        Как пишется      	Особенности
+roles:       	В секции playbook 	Самый простой способ. Подключает роль как есть
+import_role 	Внутри tasks:    	Статическое подключение. Задачи видны при разборе
+include_role 	Внутри tasks:    	Динамическое подключение. Позволяет loop, when
+
+Примеры:
+roles:
+  - nginx
+
+
+- name: Импорт роли statically
+  import_role:
+    name: nginx
+
+
+- name: Включить роль с условием
+  include_role:
+    name: nginx
+  when: ansible_os_family == "Debian"
+
+
+
+Передача переменных в роль
+
+Способ 	                    Где задаётся 	                        Переопределяет defaults?
+defaults/main.yml 	        Внутри роли (настраиваемые значения) 	❌ (самый низкий приоритет)
+vars/main.yml 	            Внутри роли (жёстко зашитые значения) 	✅ (трудно переопределить)
+vars: в roles: 	            В playbook при подключении роли 	    ✅
+--extra-vars 	            При запуске playbook 	                ✅ (самый высокий приоритет)
+group_vars/, host_vars/ 	В inventory и окружении 	            ✅
+
+
+Пример: передача переменных при подключении
+roles:
+  - role: nginx
+    vars:
+      nginx_port: 8080
+

@@ -1,0 +1,11 @@
+mkdir -p roles/myrole/{tasks,handlers,defaults,vars,templates,files,meta}
+touch roles/myrole/tasks/main.yml
+touch roles/myrole/defaults/main.yml
+
+ansible-galaxy init roles/myrole_init
+ansible-galaxy init roles/nginx_demo
+
+https://ansible.readthedocs.io/projects/molecule/
+
+pip install ansible-lint
+ansible-lint roles/my_role

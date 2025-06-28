@@ -1,0 +1,6 @@
+- name: Тестирование роли nginx_demo
+  hosts: webservers
+  gather_facts: false
+
+  roles:
+    - nginx_demo
