@@ -1,0 +1,44 @@
+- name: Настройка веб-сервера
+  hosts: web
+  become: true
+
+  roles:
+    - nginx
+
+
+roles:
+  - role: nginx
+    vars:
+      nginx_listen_port: 8080
+
+
+roles:
+  - common
+  - nginx
+  - firewall
+
+
+
+roles:
+  - role: mysql
+    when: ansible_os_family == "Debian"
+
+
+roles:
+  - role: nginx
+    tags: ['web', 'install']
+
+ansible-playbook site.yml --tags web
+
+##################################################
+
+
+
+Обычный запуск:
+ansible-playbook site.yaml
+
+Только по тегу web:
+ansible-playbook site.yaml --tags web
+
+Пропустить роль с тегом install:
+ansible-playbook site.yaml --skip-tags install

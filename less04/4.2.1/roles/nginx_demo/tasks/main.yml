@@ -1,0 +1,5 @@
+---
+# tasks file for roles/nginx_demo
+- name: Тестовая задача в роли nginx_demo
+  ansible.builtin.debug:
+    msg: "Роль nginx_demo работает!"

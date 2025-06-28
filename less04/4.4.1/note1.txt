@@ -1,0 +1,84 @@
+Пример: структура роли с переменными
+
+roles/
+└── nginx/
+    ├── defaults/
+    │   └── main.yml       # Переопределяемые значения
+    ├── vars/
+    │   └── main.yml       # Жёсткие переменные (редко)
+    └── tasks/
+        └── main.yml
+
+
+Пример содержимого defaults/main.yml
+nginx_port: 80
+nginx_user: www-data
+nginx_enable_ssl: false
+
+В tasks/main.yml:
+- name: Установить конфигурацию nginx
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+
+В шаблоне nginx.conf.j2:
+listen {{ nginx_port }};
+user {{ nginx_user }};
+
+
+Как переопределить переменные роли
+
+В playbook:
+roles:
+  - role: nginx
+    vars:
+      nginx_port: 8080
+
+
+В инвентори (group_vars / host_vars):
+group_vars/webservers.yml
+nginx_port: 8081
+
+
+Через --extra-vars:
+ansible-playbook site.yml -e "nginx_port=9090"
+
+
+#####################################################
+
+Структура проекта
+project/
+├── site.yaml
+└── roles/
+    └── nginx_demo/
+        ├── defaults/
+        │   └── main.yml
+        ├── tasks/
+        │   └── main.yml
+
+roles/nginx_demo/defaults/main.yml
+# Значения по умолчанию
+nginx_demo_port: 80
+
+roles/nginx_demo/tasks/main.yml
+- name: Показать порт, на котором будет слушать Nginx
+  ansible.builtin.debug:
+    msg: "Nginx будет работать на порту {{ nginx_demo_port }}"
+
+site.yaml — playbook, где роль вызывается с переопределением переменной
+- name: Демонстрация переопределения переменных роли
+  hosts: localhost
+  gather_facts: false
+
+  roles:
+    - role: nginx_demo
+      vars:
+        nginx_demo_port: 8080
+
+Ожидаемый вывод при запуске:
+ansible-playbook site.yaml
+
+TASK [nginx_demo : Показать порт, на котором будет слушать Nginx]
+ok: [localhost] => {
+    "msg": "Nginx будет работать на порту 8080"
+}

@@ -1,0 +1,6 @@
+---
+- name: Тестирование роли nginx_demo
+  hosts: localhost
+  remote_user: root
+  roles:
+    - roles/nginx_demo

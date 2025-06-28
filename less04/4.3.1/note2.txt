@@ -1,0 +1,76 @@
+
+import_role: статическое подключение роли. Все задачи из роли загружаются во время парсинга playbook.
+- name: Импорт роли example
+  import_role:
+    name: example
+
+include_role: динамическое подключение роли. Задачи из роли загружаются во время выполнения playbook.
+- name: Включение роли example
+  include_role:
+    name: example
+
+
+При использовании import_role и include_role можно передавать переменные следующим образом:
+- name: Включение роли с переменными
+  include_role:
+    name: example
+  vars:
+    var1: value1
+    var2: value2
+
+
+- name: Включение роли в цикле
+  include_role:
+    name: "{{ item }}"
+  loop:
+    - role1
+    - role2
+
+
+roles:
+  - role: example
+    tags: ['setup', 'install']
+
+ansible-playbook site.yml --tags install
+
+
+В файле meta/main.yml роли можно указать зависимости от других ролей:
+dependencies:
+  - role: common
+  - role: apache
+    vars:
+      apache_port: 8080
+
+
+Начиная с Ansible 2.11, можно определить спецификацию аргументов роли в файле meta/argument_specs.yml. Это позволяет Ansible автоматически проверять переданные переменные на соответствие ожидаемым типам и значениям.
+argument_specs:
+  main:
+    options:
+      nginx_port:
+        type: int
+        required: true
+        default: 80
+
+
+По умолчанию, Ansible выполняет каждую роль только один раз, даже если она указана несколько раз в playbook. Однако, если необходимо выполнить роль несколько раз с разными параметрами, можно использовать параметр allow_duplicates: true в meta/main.yml роли:
+# meta/main.yml
+allow_duplicates: true
+
+
+Создание коллекции:
+ansible-galaxy collection init my_namespace.my_collection
+
+Добавление роли в коллекцию:
+cd my_namespace/my_collection/roles
+ansible-galaxy init my_role
+
+
+Файл requirements.yml позволяет определить список внешних ролей и коллекций, необходимых для проекта:
+roles:
+  - src: geerlingguy.nginx
+    version: 3.1.0
+collections:
+  - name: community.general
+    version: 3.2.0
+
+ansible-galaxy install -r requirements.yml
