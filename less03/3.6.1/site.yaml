@@ -1,0 +1,30 @@
+---
+
+- name: Пример использования handlers и notify
+  hosts: webservers
+  become: true
+  gather_facts: false
+
+  vars:
+    config_src: ./templates/myapp.conf.j2
+    config_dest: /etc/myapp.conf
+
+  tasks:
+
+    - name: Копировать шаблон конфигурации
+      ansible.builtin.template:
+        src: "{{ config_src }}"
+        dest: "{{ config_dest }}"
+        mode: '0644'
+      notify: Перезапустить myapp
+
+    - name: Завершающее сообщение
+      ansible.builtin.debug:
+        msg: "✅ Конфигурация обновлена, проверка завершена"
+
+  handlers:
+
+    - name: Перезапустить myapp
+      ansible.builtin.service:
+        name: nginx
+        state: restarted

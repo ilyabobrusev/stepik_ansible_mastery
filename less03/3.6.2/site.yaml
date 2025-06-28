@@ -1,0 +1,31 @@
+---
+
+- name: Получить основной IP хоста вручную
+  hosts: all
+  gather_facts: false
+
+  tasks:
+
+    - name: Собрать только факт ansible_default_ipv4
+      ansible.builtin.setup:
+        filter: ansible_default_ipv4
+
+    - name: Вывести IP-адрес
+      ansible.builtin.debug:
+        msg: "Основной IP: {{ ansible_default_ipv4.address }}"
+
+    - name: Получить архитектуру CPU
+      ansible.builtin.setup:
+        filter: ansible_architecture
+
+    - name: Вывести архитектуру CPU
+      ansible.builtin.debug:
+        msg: "Архитектура CPU: {{ ansible_architecture }}"
+
+    - name: Собрать ОС
+      ansible.builtin.setup:
+        filter: "ansible_distribution*"
+
+    - name: Вывести ОС
+      ansible.builtin.debug:
+        msg: "Distribution: {{ ansible_distribution }}, {{ ansible_distribution_version }}, {{ ansible_distribution_release }}"

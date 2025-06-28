@@ -1,0 +1,33 @@
+---
+
+- name: Собрать только нужные факты с хоста
+  hosts: all
+  gather_facts: false
+
+  tasks:
+
+    - name: Собрать выбранные факты вручную
+      ansible.builtin.setup:
+        filter:
+          - ansible_memtotal_mb
+          - ansible_processor_cores
+          - ansible_architecture
+          - ansible_distribution*
+          - ansible_default_ipv4
+          - ansible_dns
+          - ansible_mounts
+
+    - name: Вывести системную информацию
+      ansible.builtin.debug:
+        msg:
+          - "Операционная система: {{ ansible_distribution }} {{ ansible_distribution_version }}"
+          - "ОЗУ: {{ ansible_memtotal_mb }} MB"
+          - "CPU: {{ ansible_architecture }}, ядер: {{ ansible_processor_cores }}"
+          - "IP-адрес: {{ ansible_default_ipv4.address }}"
+          - "Шлюз: {{ ansible_default_ipv4.gateway }}"
+          - "DNS: {{ ansible_dns.nameservers | join(', ') }}"
+          - "Файловые системы:"
+          - "{{ ansible_mounts }}"
+          - "{{ ansible_mounts | map(attribute='mount') | list }}"
+          - "{{ ansible_mounts | map(attribute='mount') | list | zip(ansible_mounts | map(attribute='device') | list) | list }}"
+          - "{{ ansible_mounts | json_query('[].{mount: mount, device: device}') }}"
