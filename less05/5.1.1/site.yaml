@@ -1,0 +1,13 @@
+---
+
+- name: Установка Docker на Ubuntu
+  hosts: webservers
+  become: true
+
+  roles:
+    - role: geerlingguy.docker
+      vars:
+        docker_users:
+          - ubuntu
+        docker_apt_release_channel: stable
+        docker_install_compose_plugin: true

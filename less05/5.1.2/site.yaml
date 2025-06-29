@@ -1,0 +1,16 @@
+---
+
+- name: Установка Docker на Ubuntu
+  hosts: webservers
+  become: true
+
+  tasks:
+
+    - name: Запустить контейнер nginx
+      community.docker.docker_container:
+        name: nginx
+        image: nginx:latest
+        ports:
+          - "8080:80"
+        state: started
+        restart_policy: always

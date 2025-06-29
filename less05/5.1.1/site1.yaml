@@ -1,0 +1,32 @@
+---
+
+- name: Установка Docker на Ubuntu
+  hosts: webservers
+  become: true
+
+  tasks:
+    - name: Убедиться, что служба Docker запущена и включена
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: true
+      when: ansible_service_mgr == "systemd"
+
+    - name: Проверка - работает ли роль на поддерживаемой ОС
+      ansible.builtin.debug:
+        msg: "OS {{ ansible_os_family }} поддерживается!"
+      when: ansible_os_family in ['Debian', 'RedHat']
+
+
+    - name: Проверка поддержки ОС
+      ansible.builtin.assert:
+        that:
+          - ansible_os_family in ['Debian']
+        fail_msg: "Поддерживаются только Debian-based дистрибутивы."
+#      failed_when: false
+
+    - name: Проверка - работает ли Docker (docker info)
+      ansible.builtin.command: docker info
+      register: docker_check
+      changed_when: false
+      failed_when: docker_check.rc == 0
