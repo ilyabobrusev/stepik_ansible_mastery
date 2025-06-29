@@ -1,0 +1,51 @@
+---
+
+- name: Сборка Docker-образа приложения
+  hosts: db1
+  become: true
+  gather_facts: true
+  vars:
+    image_tag: v0.0.1
+
+  tasks:
+    - name: Синхронизация контекста сборки
+      ansible.builtin.copy:
+        src: ./app/
+        dest: /tmp/docker-build-context
+        mode: '0755'
+
+    - name: Собрать образ из Dockerfile
+      community.docker.docker_image:
+        state: present
+        name: myapp
+        tag: v0.0.1
+        force_source: true
+        source: build
+        build:
+          path: /tmp/docker-build-context
+          dockerfile: Dockerfile
+          pull: true
+
+    - name: Запустить контейнер myapp
+      community.docker.docker_container:
+        name: myapp
+        image: myapp:{{ image_tag }}
+        state: started
+        restart_policy: always
+        ports:
+          - "8000:8000"
+
+    - name: Ждём, пока порт 8000 станет доступен
+      ansible.builtin.wait_for:
+        port: 8000
+        timeout: 10
+        delay: 1
+
+    - name: Проверяем HTTP-ответ (глубокая проверка)
+      ansible.builtin.uri:
+        url: "http://{{ ansible_host }}:8000"
+        status_code: 200
+      register: healthcheck
+      until: healthcheck.status == 200
+      retries: 3
+      delay: 3

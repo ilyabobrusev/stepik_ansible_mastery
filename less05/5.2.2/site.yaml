@@ -1,0 +1,20 @@
+---
+
+- name: Запуск контейнера Nginx через Ansible
+  hosts: webservers
+  gather_facts: false
+
+  tasks:
+    - name: Убедиться, что образ nginx загружен
+      community.docker.docker_image:
+        name: nginx
+        source: pull
+
+    - name: Запустить контейнер nginx
+      community.docker.docker_container:
+        name: nginx
+        image: nginx
+        state: started
+        restart_policy: always
+        ports:
+          - "8080:80"

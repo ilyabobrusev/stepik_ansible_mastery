@@ -1,0 +1,6 @@
+ansible-galaxy collection install containers.podman
+
+community.general 	Включает универсальные модули, в т.ч. podman_container (устаревший)
+kubernetes.core 	Установка и управление Kubernetes
+openshift.k8s    	Поддержка OpenShift
+containers.podman 	Полноценная замена Docker-контролю через Podman
