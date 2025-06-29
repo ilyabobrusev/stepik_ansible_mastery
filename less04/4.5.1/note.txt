@@ -1,0 +1,136 @@
+Установка роли из Galaxy
+ansible-galaxy install geerlingguy.nginx
+
+Использование роли в playbook
+roles:
+  - geerlingguy.nginx
+
+Установка ролей через requirements.yml
+Чтобы задокументировать зависимости, создаём файл requirements.yml:
+roles:
+  - src: geerlingguy.nginx
+    version: 3.1.0
+
+  - src: git+https://github.com/myorg/ansible-role-app.git
+    scm: git
+    version: main
+    name: myapp
+
+Установка:
+ansible-galaxy install -r requirements.yml
+
+
+Подключение ролей из Git
+Роли можно скачивать напрямую из Git:
+roles:
+  - src: https://github.com/yourorg/ansible-role-nginx.git
+    scm: git
+    version: stable
+    name: nginx_custom
+
+
+Рекомендуемый способ — создать локальную папку roles/, и настроить ansible.cfg:
+[defaults]
+roles_path = ./roles
+
+##################################################################################
+requirements.yml
+roles:
+  - name: geerlingguy.nginx
+    version: 3.1.0
+
+Структура проекта
+
+project/
+├── requirements.yml
+├── site.yaml
+└── inventory/
+    └── hosts
+
+inventory/hosts
+[web]
+192.168.22.10 ansible_user=ubuntu
+
+site.yaml — playbook
+- name: Установка Nginx с помощью внешней роли
+  hosts: web
+  become: true
+
+  roles:
+    - role: geerlingguy.nginx
+      vars:
+        nginx_listen_port: 8080
+        nginx_vhosts:
+          - listen: "8080 default_server"
+            server_name: "example.com"
+            root: "/var/www/html"
+            index: "index.html"
+
+Запуск
+ansible-playbook -i inventory/hosts site.yaml
+
+
+##################################################################################
+Шпаргалка: как использовать внешнюю роль
+1. Найди нужную роль
+
+Зайди на galaxy.ansible.com, введи, например:
+nginx
+
+2. Создай requirements.yml
+roles:
+  - name: geerlingguy.nginx
+    version: 3.1.0
+
+Можно подключить и Git:
+- src: git+https://github.com/myorg/ansible-role-app.git
+  scm: git
+  version: main
+  name: app_custom
+
+3. Установи роль
+ansible-galaxy install -r requirements.yml
+
+4. Используй роль в site.yaml
+roles:
+  - role: geerlingguy.nginx
+    vars:
+      nginx_listen_port: 8080
+
+
+##################################################################################
+Структура файла requirements.yml
+Файл может содержать:
+    секцию roles: — для внешних ролей,
+    секцию collections: — для коллекций.
+
+roles:
+  - name: geerlingguy.nginx
+    version: 3.1.0
+
+collections:
+  - name: community.mysql
+    version: 3.4.0
+
+Пример 1: подключение роли из Galaxy
+roles:
+  - name: geerlingguy.nginx
+    version: 3.1.0
+
+Установка:
+ansible-galaxy install -r requirements.yml
+
+Пример 2: подключение роли из .tar.gz
+roles:
+  - name: apache_archive
+    src: https://example.com/roles/apache-role.tar.gz
+    version: "1.2.0"
+
+Роль будет распакована и установлена под указанным name.
+
+
+##################################################################################
+Рекомендации:
+    Для Galaxy — указывай version: из списка релизов.
+    Для Git — указывай version: как tag, branch или commit.
+    Для .tar.gz — указывай version: чисто для читабельности и логов.
