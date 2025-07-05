@@ -1,0 +1,21 @@
+- name: Получить информацию о удалённом Docker Engine
+  hosts: db1
+  gather_facts: false
+
+  tasks:
+    - name: Запрашиваем информацию о Docker
+      community.docker.docker_host_info:
+      register: docker_info
+
+    - name: Вывод версии Docker
+      ansible.builtin.debug:
+        msg: "Версия Docker: {{ docker_info.host_info.ServerVersion }}"
+
+    - name: Вывод информации о хранилище
+      ansible.builtin.debug:
+        msg: "Storage Driver: {{ docker_info.host_info.Driver }}"
+
+    - name: Вывод лимитов
+      ansible.builtin.debug:
+        msg: >-
+          CPU: {{ docker_info.host_info.NCPU }} | RAM: {{ (docker_info.host_info.MemTotal // 1024 // 1024) }} MB

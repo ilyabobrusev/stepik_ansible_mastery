@@ -1,0 +1,44 @@
+Значение        Действие
+present         docker compose up -d
+absent          docker compose down
+stopped         docker compose stop
+restarted       docker compose restart
+pulled          docker compose pull
+
+
+Примеры задач
+
+Запуск сервисов:
+- name: Запустить приложение
+  community.docker.docker_compose:
+    project_src: /opt/app
+    state: present
+
+Остановка:
+- name: Остановить приложение
+  community.docker.docker_compose:
+    project_src: /opt/app
+    state: stopped
+
+Полное удаление:
+- name: Удалить контейнеры и сеть
+  community.docker.docker_compose:
+    project_src: /opt/app
+    state: absent
+
+Перезапуск:
+- name: Перезапустить приложение
+  community.docker.docker_compose:
+    project_src: /opt/app
+    state: restarted
+
+Обновить образы:
+- name: Обновить образы из registry
+  community.docker.docker_compose:
+    project_src: /opt/app
+    state: pulled
+
+Лучшая практика:
+Делай template: и docker_compose: в одной задаче — так Ansible будет управлять всей системой декларативно.
+Используй notify: + handlers, если хочешь перезапускать docker_compose при изменении конфигов.
+

@@ -1,0 +1,16 @@
+---
+- name: Создать каталог логов на хосте
+  file:
+    path: /opt/logs/nginx
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Запустить NGINX с bind mount для логов
+  community.docker.docker_container:
+    name: nginx
+    image: nginx:latest
+    state: started
+    volumes:
+      - /opt/logs/nginx:/var/log/nginx

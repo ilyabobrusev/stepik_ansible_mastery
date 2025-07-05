@@ -1,0 +1,15 @@
+- name: Очистка неиспользуемых Docker-томов
+  hosts: db1
+  gather_facts: false
+
+  tasks:
+    - name: Получить список всех Docker-томов
+      community.docker.docker_volume_info:
+        name: "*"
+      register: all_volumes
+
+    - name: Удалить все тома, которые не используются
+      community.docker.docker_volume:
+        name: "{{ item.Name }}"
+        state: absent
+      loop: "{{ all_volumes.volumes | selectattr('Dangling', 'defined') | selectattr('Dangling', 'equalto', true) | list }}"

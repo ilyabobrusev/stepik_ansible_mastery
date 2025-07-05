@@ -1,0 +1,39 @@
+---
+- name: Генерируем и используем volume с конфигом
+  hosts: docker_remote
+  gather_facts: false
+
+  tasks:
+    - name: Создаём volume
+      community.docker.docker_volume:
+        name: appconfig
+
+    - name: Копируем конфиг в файл (локально)
+      ansible.builtin.copy:
+        content: |
+          {
+            "setting": "production",
+            "debug": false
+          }
+        dest: /tmp/config.json
+        mode: '0644'
+      delegate_to: localhost
+
+    - name: Копируем конфиг в volume через временный контейнер
+      community.docker.docker_container:
+        name: config_writer
+        image: busybox
+        command: sh -c 'cp /config/config.json /data/config.json'
+        volumes:
+          - appconfig:/data
+          - /tmp/config.json:/config/config.json:ro
+        state: started
+        auto_remove: true
+
+    - name: Запускаем контейнер с приложением
+      community.docker.docker_container:
+        name: myapp
+        image: myorg/app:latest
+        state: started
+        volumes:
+          - appconfig:/app/config

@@ -1,0 +1,14 @@
+# Порты
+web_port: 8080
+
+# Названия образов (могут быть локальными или из registry)
+nginx_image: nginx:1.28
+app_image: myregistry/myapp:latest
+db_image: postgres:14
+
+# Переменные среды для приложения и базы
+app_env: production
+
+db_user: appuser
+db_password: supersecret
+db_name: appdb

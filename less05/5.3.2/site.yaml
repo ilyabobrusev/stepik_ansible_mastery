@@ -1,0 +1,68 @@
+- name: Запуск приложения через Docker Compose
+  hosts: db1
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Создать /opt/app-hw
+      ansible.builtin.file:
+        dest: /opt/app-hw/{{ item }}
+        state: directory
+        mode: '0755'
+      loop:
+        - nginx
+        - app
+
+    - name: Копирование всех конфигов
+      ansible.builtin.template:
+        src: "{{ item }}.j2"
+        dest: "/opt/app-hw/{{ item }}"
+        mode: '0644'
+      loop:
+        - 'docker-compose.yml'
+        - 'app/app.py'
+        - 'nginx/nginx.conf'
+      notify: Перезапуск приложения
+
+    - name: Запустить сервисы через Docker Compose
+      community.docker.docker_compose_v2:
+        project_src: /opt/app-hw
+
+  handlers:
+    - name: Перезапуск приложения
+      community.docker.docker_compose_v2:
+        project_src: /opt/app-hw
+        state: restarted
+
+  post_tasks:
+
+    - name: Подождать, пока порт станет доступен
+      ansible.builtin.wait_for:
+        port: "{{ nginx_port }}"
+        host: "{{ ansible_host }}"
+        delay: 2
+        timeout: 20
+
+    - name: Проверяем HTTP-ответ
+      ansible.builtin.uri:
+        url: "http://{{ ansible_host }}:{{ nginx_port }}"
+        status_code: 200
+      register: healthcheck
+      until: healthcheck.status == 200
+      retries: 3
+      delay: 3
+
+    - name: Вывод результата
+      ansible.builtin.debug:
+        msg: "url: {{ healthcheck.url }}, status: {{ healthcheck.status }}"
+
+###########################################################################
+    # - name: Копирование всех конфигов с использованием массива
+    #   ansible.builtin.template:
+    #     src: "{{ item.src }}"
+    #     dest: "/opt/app-hw/{{ item.dest }}"
+    #     mode: '0644'
+    #   loop:
+    #     - { src: 'docker-compose.yml.j2', dest: 'docker-compose.yml' }
+    #     - { src: 'app.py.j2', dest: 'app/app.py' }
+    #     - { src: 'nginx.conf.j2', dest: 'nginx/nginx.conf' }

@@ -1,0 +1,44 @@
+- name: Развёртывание мультиконтейнерного приложения
+  hosts: db1
+  become: true
+  collections:
+    - community.docker
+
+  roles:
+    - nginx
+    - app
+    - db
+
+  tasks:
+    - name: Создать директорию проекта
+      file:
+        path: /opt/app
+        state: directory
+        mode: "0755"
+
+    - name: Скопировать docker-compose.yml
+      template:
+        src: docker-compose.yml.j2
+        dest: /opt/app/docker-compose.yml
+      notify: Перезапуск приложения
+
+    - name: Запустить docker-compose (если файл не менялся)
+      community.docker.docker_compose:
+        project_src: /opt/app
+        state: present
+
+    - name: Проверить, что nginx отвечает
+      uri:
+        url: "http://{{ inventory_hostname }}:{{ web_port }}"
+        return_content: true
+      register: response
+
+    - name: Показать ответ
+      debug:
+        var: response.content
+
+  handlers:
+    - name: Перезапуск приложения
+      community.docker.docker_compose:
+        project_src: /opt/app
+        state: restarted

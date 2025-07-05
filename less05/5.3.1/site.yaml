@@ -1,0 +1,48 @@
+- name: Запуск приложения через Docker Compose
+  hosts: db1
+  become: true
+  gather_facts: false
+
+  vars:
+    web_port: 8080
+    app_image: nginx:latest
+    app_env: production
+    db_user: myuser
+    db_password: secretpass
+
+  tasks:
+    - name: Создать /opt/app
+      ansible.builtin.file:
+        dest: /opt/app
+        state: directory
+        mode: '0755'
+
+    - name: Скопировать docker-compose.yml
+      ansible.builtin.template:
+        src: docker-compose.yml.j2
+        dest: /opt/app/docker-compose.yml
+        mode: '0644'
+
+    - name: Запустить сервисы через Docker Compose
+      community.docker.docker_compose_v2:
+        project_src: /opt/app
+
+    - name: Подождать, пока порт станет доступен
+      ansible.builtin.wait_for:
+        port: "{{ web_port }}"
+        host: "{{ ansible_host }}"
+        delay: 2
+        timeout: 20
+
+    - name: Проверяем HTTP-ответ
+      ansible.builtin.uri:
+        url: "http://{{ ansible_host }}:{{ web_port }}"
+        status_code: 200
+      register: healthcheck
+      until: healthcheck.status == 200
+      retries: 3
+      delay: 3
+
+    - name: Вывод результата
+      ansible.builtin.debug:
+        msg: "url: {{ healthcheck.url }}, status: {{ healthcheck.status }}"

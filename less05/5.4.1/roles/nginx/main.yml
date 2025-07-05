@@ -1,0 +1,4 @@
+- name: Обеспечить, что образ nginx загружен (если не через Compose)
+  community.docker.docker_image:
+    name: "{{ nginx_image }}"
+    source: pull
