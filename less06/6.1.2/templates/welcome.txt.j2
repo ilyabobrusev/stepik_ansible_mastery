@@ -1,0 +1,4 @@
+Hello from {{ inventory_hostname }}!
+Your IP address is: {{ ansible_default_ipv4.address }}
+Deployed on: {{ ansible_date_time.date }} at {{ ansible_date_time.time }}
+{{ custom_message | default('Welcome to our infrastructure! Managed by Ansible.') }}

@@ -1,0 +1,1 @@
+ansible db1 -m shell -a "cat /tmp/welcome.txt"

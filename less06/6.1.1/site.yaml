@@ -1,0 +1,12 @@
+- name: Generate /etc/motd using Jinja2 template
+  hosts: db1
+  become: true
+
+  tasks:
+    - name: Create /etc/motd
+      ansible.builtin.template:
+        src: motd.j2
+        dest: /etc/motd
+        owner: root
+        group: root
+        mode: '0644'
