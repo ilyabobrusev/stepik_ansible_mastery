@@ -1,0 +1,9 @@
+---
+
+services:
+  - name: nginx
+    description: Web Server
+    exec: /usr/sbin/nginx
+  - name: redis
+    description: In-memory DB
+    exec: /usr/bin/redis-server

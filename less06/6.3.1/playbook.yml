@@ -1,0 +1,15 @@
+---
+
+- name: Generate systemd unit files
+  hosts: db1
+  gather_facts: false
+
+  tasks:
+    - name: Generate units from template
+      ansible.builtin.template:
+        src: systemd-unit.j2
+        dest: "/tmp/{{ svc.name }}.service"
+        mode: "0644"
+      loop: "{{ services }}"
+      loop_control:
+        loop_var: svc

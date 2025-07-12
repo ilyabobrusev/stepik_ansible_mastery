@@ -1,0 +1,82 @@
+Список (list)
+Пример списка в YAML:
+packages:
+  - nginx
+  - git
+  - curl
+
+#######################################################
+
+Словарь (dictionary)
+Словарь содержит пары "ключ — значение":
+user:
+  name: alice
+  shell: /bin/bash
+
+
+#######################################################
+
+Cgисок словарей 
+services:
+  - name: nginx
+    port: 80
+    enabled: true
+  - name: redis
+    port: 6379
+    enabled: false
+  - name: postgres
+    port: 5432
+    enabled: true
+
+Мы используем цикл:
+{% for svc in services %}
+  - {{ svc.name }} → {{ svc.port }}
+{% endfor %}
+
+Пример: шаблон конфигурации сервисов:
+Services configuration
+======================
+{% for svc in services %}
+Service: {{ svc.name | capitalize }}
+Port: {{ svc.port }}
+Status: {% if svc.enabled %}enabled{% else %}disabled{% endif %}
+{% endfor %}
+
+#######################################################
+
+Вложенные словари
+Если структура усложняется — обращение выглядит так:
+db:
+  prod:
+    host: db1.internal
+    port: 5432
+
+В шаблоне:
+
+DB host: {{ db.prod.host }}
+
+#######################################################
+
+Цикл по словарю (dict)
+Если у вас просто словарь:
+env:
+  APP_ENV: production
+  DEBUG: false
+
+В шаблоне:
+{% for key, value in env.items() %}
+{{ key }}={{ value }}
+{% endfor %}
+
+Вывод:
+APP_ENV=production
+DEBUG=False
+
+#######################################################
+
+Условие внутри цикла:
+{% for svc in services %}
+{% if svc.enabled %}
+- {{ svc.name }} (enabled)
+{% endif %}
+{% endfor %}

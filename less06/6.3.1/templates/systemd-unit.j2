@@ -1,0 +1,9 @@
+[Unit]
+Description={{ svc.description }}
+
+[Service]
+ExecStart={{ svc.exec }}
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
