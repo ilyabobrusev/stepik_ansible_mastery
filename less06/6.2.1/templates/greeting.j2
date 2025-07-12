@@ -1,0 +1,5 @@
+Hello {{ user_name | upper }}!
+You are working in the {{ env | lower }} environment.
+Available services: {{ services | join(', ') }}
+{{ custom_message | default("No custom message.") }}
+Adjusted hostname: {{ inventory_hostname | replace('test', 'prod') }}

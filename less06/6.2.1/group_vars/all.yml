@@ -1,0 +1,7 @@
+user_name: Ansible
+env: STAGING
+services:
+  - nginx
+  - redis
+  - postgres
+#custom_message: "Welcome to your server!"

@@ -1,0 +1,11 @@
+---
+- name: Test filters in Jinja2
+  hosts: db1
+  gather_facts: true
+
+  tasks:
+    - name: Generate greeting
+      ansible.builtin.template:
+        src: greeting.j2
+        dest: /tmp/greeting.txt
+        mode: "644"
