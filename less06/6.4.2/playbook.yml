@@ -1,0 +1,12 @@
+---
+
+- name: Render modular nginx config
+  hosts: db1
+  gather_facts: false
+
+  tasks:
+    - name: Generate nginx.conf
+      ansible.builtin.template:
+        src: nginx.conf.j2
+        dest: /tmp/nginx.conf
+        mode: '0644'

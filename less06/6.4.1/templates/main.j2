@@ -1,0 +1,8 @@
+{% include 'header.j2' %}
+
+List of services:
+{% for item in services %}
+{% include 'service-block.j2' %}
+{% endfor %}
+
+{% include 'footer.j2' %}

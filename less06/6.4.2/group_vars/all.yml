@@ -1,0 +1,5 @@
+sites:
+  - domain: app1.example.com
+    port: 8080
+  - domain: app2.example.com
+    port: 9090

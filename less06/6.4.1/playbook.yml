@@ -1,0 +1,18 @@
+---
+
+- name: Render modular template
+  hosts: db1
+  gather_facts: false
+
+  tasks:
+    - name: Generate combined config
+      ansible.builtin.template:
+        src: main.j2
+        dest: /tmp/final.txt
+        mode: '0644'
+
+    - name: Generate extends config
+      ansible.builtin.template:
+        src: custom.j2
+        dest: /tmp/extends.txt
+        mode: '0644'
