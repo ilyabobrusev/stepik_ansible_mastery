@@ -1,0 +1,12 @@
+---
+
+- name: Generate full nginx config
+  hosts: db1
+  gather_facts: false
+
+  tasks:
+    - name: Render final nginx.conf
+      ansible.builtin.template:
+        src: nginx.conf.j2
+        dest: /tmp/nginx-complex.conf
+        mode: '0644'

@@ -1,0 +1,15 @@
+server {
+    listen {{ "443 ssl" if site.https else "80" }};
+    server_name {{ site.domain }};
+    {% if site.https %}
+    
+    ssl_certificate /etc/letsencrypt/live/{{ site.domain }}/fullchain.pem;
+    sl_certificate_key /etc/letsencrypt/live/{{ site.domain }}/privkey.pem;
+    {% endif %}
+
+    location / {
+        proxy_pass http://127.0.0.1:{{ site.port }};
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}

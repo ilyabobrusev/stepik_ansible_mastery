@@ -1,0 +1,17 @@
+# Nginx config
+# {{ note | default("No note provided") }}
+
+user www-data;
+worker_processes auto;
+pid /run/nginx.pid;
+
+events {
+  worker_connections 1024;
+}
+
+http {
+{% for site in sites %}
+{% include 'server-block.j2' %}
+
+{% endfor %}
+}
