@@ -1,0 +1,80 @@
+Пример: безопасная структура проекта
+
+ansible-project/
+├── inventories/
+│   ├── dev/
+│   │   ├── hosts.ini
+│   │   └── group_vars/
+│   │       ├── all.yml
+│   │       └── vault.yml  # Зашифрованный
+│   └── prod/
+│       ├── hosts.ini
+│       └── group_vars/
+│           ├── all.yml
+│           └── vault.yml  # Зашифрованный
+├── roles/
+│   └── app/
+│       ├── defaults/
+│       │   └── main.yml
+│       ├── vars/
+│       │   └── main.yml
+│       ├── tasks/
+│       └── templates/
+└── playbooks/
+    └── deploy.yml
+
+##############################################
+
+ansible-playbook -i inventories/prod/hosts.ini playbooks/deploy.yml --vault-password-file ~/.vaults/prod.vault_pass
+
+##############################################
+
+ansible-inventory -i inventories/prod/hosts.ini --list
+ansible-playbook playbooks/deploy.yml --list-hosts
+ansible -i inventories/prod/hosts.ini all -m debug -a 'var=db_password'
+
+##############################################
+
+Пример безопасного task'а:
+
+- name: Обновляем пароль пользователя
+  user:
+    name: admin
+    password: "{{ db_password | password_hash('sha512') }}"
+  no_log: true
+
+Также можно использовать глобальное отключение логирования:
+
+- hosts: all
+  tasks:
+    - name: Do sensitive stuff
+      debug:
+        var: secret_token
+      no_log: true
+
+##############################################
+
+Пример: GitLab CI
+
+stages:
+  - deploy
+
+deploy:
+  stage: deploy
+  image: python:3.11
+  variables:
+    VAULT_PASS: $VAULT_PASS_PROD  # хранится в Settings → CI/CD → Variables
+
+  script:
+    - apt-get update && apt-get install -y ansible
+    - echo "$VAULT_PASS" > vault_pass.txt
+    - ansible-playbook -i inventories/prod/hosts.ini playbooks/deploy.yml \
+        --vault-password-file vault_pass.txt
+
+##############################################
+
+- name: Отправка webhook
+  uri:
+    url: "https://api.example.com/send?token={{ vault_api_token }}"
+  no_log: true
+
