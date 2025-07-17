@@ -1,0 +1,44 @@
+Стандартная структура с vault-переменными
+ansible-project/
+├── inventories/
+│   └── prod/
+│       ├── hosts.ini
+│       └── group_vars/
+│           ├── all.yml
+│           └── vault.yml  # зашифрованный
+├── playbooks/
+│   └── deploy.yml
+
+Использование зашифрованных переменных
+В vault.yml:
+vault_db_password: "S3cr3tP@ss"
+
+В all.yml:
+db_user: "admin" 
+db_password: "{{ vault_db_password }}"
+
+Playbook использует переменные как обычно
+- hosts: app
+  become: true
+  vars:
+    env: prod
+  tasks:
+    - name: Установка переменных окружения
+      copy:
+        dest: "/etc/app/env.conf"
+        content: |
+          DB_USER={{ db_user }}
+          DB_PASSWORD={{ db_password }}
+
+#################################################
+
+Особенности шаблонов (Jinja2) и vault
+Файл шаблона templates/env.j2:
+DB_USER={{ db_user }}
+DB_PASSWORD={{ db_password }}
+
+- name: Генерация .env
+  template:
+    src: "env.j2"
+    dest: "/opt/app/.env"
+  no_log: true

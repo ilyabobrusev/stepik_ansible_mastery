@@ -1,0 +1,10 @@
+---
+
+- name: Ansible -vault test
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Проверка переменных
+      ansible.builtin.debug:
+        var: vault_db_password

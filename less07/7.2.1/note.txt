@@ -1,0 +1,23 @@
+Создаёт новый файл и сразу предлагает ввести данные в защищённом редакторе (обычно vi или $EDITOR)
+ansible-vault create group_vars/prod/vault.yml
+Пример содержимого, которое ты можешь ввести:
+vault_db_password: "S3cr3tPass"
+vault_api_token: "token-abc123"
+
+Применяется для зашифровки уже существующего файла.
+ansible-vault encrypt secrets.yml
+
+Позволяет просмотреть содержимое файла, не редактируя его.
+ansible-vault view group_vars/prod/vault.yml
+
+Позволяет открыть зашифрованный файл в редакторе, внести изменения и сохранить.
+ansible-vault edit group_vars/prod/vault.yml
+
+Позволяет расшифровать файл полностью, превратив его в обычный .yml.
+ansible-vault decrypt group_vars/prod/vault.yml
+
+Позволяет сменить пароль, не раскрывая содержимое.
+ansible-vault rekey group_vars/prod/vault.yml
+
+ansible-playbook site.yml --ask-vault-pass
+ansible-playbook site.yml --vault-password-file ~/.vault_pass.txt

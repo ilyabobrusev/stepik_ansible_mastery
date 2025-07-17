@@ -3,3 +3,4 @@
 ssh/
 secret.txt
 collections/
+.vaults/prod.pass

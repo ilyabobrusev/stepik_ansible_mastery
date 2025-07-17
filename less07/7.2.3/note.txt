@@ -1,0 +1,31 @@
+Vault-файл:
+vault_db_user: "appuser"
+vault_db_password: "P@ssw0rd123"
+vault_database_url: "postgres://appuser:P@ssw0rd123@localhost:5432/appdb"
+
+group_vars/prod/all.yml:
+db_user: "{{ vault_db_user }}"
+db_password: "{{ vault_db_password }}"
+database_url: "{{ vault_database_url }}"
+
+###########################################################
+
+CI/CD и переключение окружений
+У тебя есть пайплайн:
+
+deploy-dev:
+  script:
+    - ansible-playbook site.yml -i inventories/dev --vault-password-file vault_dev.txt
+
+deploy-prod:
+  script:
+    - ansible-playbook site.yml -i inventories/prod --vault-password-file vault_prod.txt
+
+###########################################################
+
+script:
+  - echo "$VAULT_PASS" > vault_pass.txt
+  - ansible-playbook ... --vault-password-file vault_pass.txt
+  - rm -f vault_pass.txt
+
+Не забудь: переменная должна быть masked и protected.
