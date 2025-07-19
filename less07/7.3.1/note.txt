@@ -1,0 +1,49 @@
+https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#understanding-variable-precedence
+
+Место 	Пример 	Приоритет (↑ — выше)
+CLI аргументы 	                --extra-vars 	                🔼 Самый высокий
+Playbook vars: 	                vars: { var: value } 	 
+Host variables (host_vars/) 	host_vars/web1.yml 	 
+Group variables (group_vars/) 	group_vars/prod.yml 	 
+Inventory variables 	        host ansible_host=... var=value 	 
+Role vars/ 	                    roles/myrole/vars/main.yml 	 
+Role defaults/ 	                roles/myrole/defaults/main.yml 	🔽 Самый низкий
+
+
+Рекомендуемая структура проекта с переменными
+ansible-project/
+├── inventories/
+│   ├── dev/
+│   │   ├── hosts.ini
+│   │   └── group_vars/
+│   │       ├── all.yml
+│   │       └── vault.yml  # ← секреты
+│   └── prod/
+│       ├── hosts.ini
+│       └── group_vars/
+│           ├── all.yml
+│           └── vault.yml
+├── roles/
+│   └── app/
+│       ├── defaults/
+│       │   └── main.yml    # ← безопасные значения по умолчанию
+│       ├── vars/
+│       │   └── main.yml    # ← фиксированные параметры (не рекомендуются)
+│       └── tasks/
+├── playbooks/
+│   └── site.yml
+
+
+
+Как отладить переменные
+Чтобы выяснить, откуда пришла переменная, используй команду:
+ansible -i inventories/prod all -m debug -a "var=db_user"
+
+Чтобы увидеть все переменные для хоста:
+ansible -i inventories/prod web1 -m setup -a "filter=ansible_*"
+
+Или ещё лучше — включи в playbook задачу:
+- name: Debug all vars
+  debug:
+    var: hostvars[inventory_hostname]
+
