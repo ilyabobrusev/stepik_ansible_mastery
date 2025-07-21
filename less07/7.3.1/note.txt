@@ -85,3 +85,11 @@ Vault — не просто шифрование, а способ разгран
 В CI всегда передаём пароль через переменные среды 	          Безопасность и гибкость
 no_log: true обязателен 	                                    CI — не место для секретов
 Проверяй переменные через debug только в dev 	                В prod — no_log и изоляция
+
+######################################################################################
+
+gitlab-ci bp
+export VAULT_PASS="YourPassword"
+echo "$VAULT_PASS" > vault_pass.txt
+ansible-playbook -i inventories/prod playbooks/deploy.yml --vault-password-file vault_pass.txt
+rm -f vault_pass.txt
