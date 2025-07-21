@@ -9,6 +9,7 @@ Inventory variables 	        host ansible_host=... var=value
 Role vars/ 	                    roles/myrole/vars/main.yml 	 
 Role defaults/ 	                roles/myrole/defaults/main.yml 	🔽 Самый низкий
 
+######################################################################################
 
 Рекомендуемая структура проекта с переменными
 ansible-project/
@@ -33,7 +34,7 @@ ansible-project/
 ├── playbooks/
 │   └── site.yml
 
-
+######################################################################################
 
 Как отладить переменные
 Чтобы выяснить, откуда пришла переменная, используй команду:
@@ -47,3 +48,40 @@ ansible -i inventories/prod web1 -m setup -a "filter=ansible_*"
   debug:
     var: hostvars[inventory_hostname]
 
+######################################################################################
+
+Пример .gitlab-ci.yml:
+stages:
+  - deploy
+
+deploy-prod:
+  stage: deploy
+  image: python:3.11
+  variables:
+    VAULT_PASS: $VAULT_PASS_PROD  # защищённая переменная в GitLab
+
+  script:
+    - apt update && apt install -y ansible
+    - echo "$VAULT_PASS" > vault_pass.txt
+    - ansible-playbook -i inventories/prod/hosts.ini playbooks/deploy.yml \
+        --vault-password-file vault_pass.txt
+    - rm -f vault_pass.txt
+
+######################################################################################
+
+Best practices
+Рекомендация 	                                            Как реализовать
+Передавать пароль через переменную CI 	                  $VAULT_PASS, masked, protected
+Использовать отдельный vault-файл для каждого окружения 	vault.yml, vault_db.yml, vault_ci.yml
+Удалять временный файл с паролем 	                        rm -f vault_pass.txt
+Делать no_log: true в чувствительных тасках 	            Везде, где есть password, token, secret
+Разграничивать доступ по окружениям 	                    Devs ≠ Ops, CI ≠ Local
+
+######################################################################################
+
+Резюме
+Что важно помнить 	                                          Почему это критично
+Vault — не просто шифрование, а способ разграничения доступа 	Секреты видны только тому, кому надо
+В CI всегда передаём пароль через переменные среды 	          Безопасность и гибкость
+no_log: true обязателен 	                                    CI — не место для секретов
+Проверяй переменные через debug только в dev 	                В prod — no_log и изоляция
