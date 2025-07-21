@@ -1,0 +1,42 @@
+Общий синтаксис:
+{{ lookup('<плагин>', '<ключ или путь>', <аргументы>) }}
+
+
+ansible-galaxy collection install community.hashi_vault
+db_password: "{{ lookup('community.hashi_vault.hashi_vault', 'secret/data/db:password') }}"
+
+Для работы нужен экспорт следующих переменных (или настройка через Ansible):
+export VAULT_ADDR=https://vault.example.com
+export VAULT_TOKEN=s.XXXXXX
+
+
+ansible.cfg:
+[defaults]
+vars_plugins_enabled = hashivault
+
+
+Как тестировать?
+Добавь временную debug-задачу:
+- name: Показать пароль из Vault
+  debug:
+    msg: "{{ lookup('community.hashi_vault.hashi_vault', 'secret/data/db:password') }}"
+  no_log: true
+
+Проверь через dry-run или --check
+
+
+################################################################################
+
+
+Как всё это объединить в CI
+Пример .gitlab-ci.yml:
+variables:
+  VAULT_ADDR: https://vault.company.com
+  VAULT_ROLE_ID: $VAULT_ROLE_ID_PROD
+  VAULT_SECRET_ID: $VAULT_SECRET_ID_PROD
+  VAULT_PASS: $VAULT_PASS_PROD
+script:
+  - echo "$VAULT_PASS" > vault.txt
+  - ansible-playbook -i inventories/prod playbooks/deploy.yml \
+        --vault-password-file vault.txt
+  - rm -f vault.txt

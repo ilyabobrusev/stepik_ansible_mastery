@@ -1,0 +1,33 @@
+vars_plugins: внешние переменные как часть инвентори
+Плагины vars_plugins позволяют динамически подгружать переменные на основе инвентори, хостов или групп. Это особенно полезно для:
+динамического окружения (Kubernetes, AWS, Vault)
+доступа к secret-хранилищам
+автоматизации доступа к уникальным данным на каждый хост
+
+Пример: hashi_vault как vars_plugin
+Устанавливается с коллекцией:
+ansible-galaxy collection install community.hashi_vault
+
+В ansible.cfg включаем плагин:
+[defaults]
+vars_plugins_enabled = host_group_vars, hashivault
+
+Затем создаём файл group_vars/all/hashivault.yml:
+plugin: community.hashi_vault.hashi_vault
+mount_point: secret
+path: db
+field: password
+name: db_password
+
+Ansible при запуске сам подставит db_password, вытянув его из Vault.
+
+################################################################################
+
+credential_plugins: безопасная интеграция ключей доступа
+Плагины credential_plugins позволяют получать доступ к API внешнего сервиса (например, AWS или HashiCorp Vault) без явного хранения токена/секретного ключа в Ansible.
+
+Идея: ты создаёшь плагин, который сам подтягивает AWS_ACCESS_KEY_ID, VAULT_TOKEN или другой ключ из защищённого источника (например, CI/CD vault, аппаратный HSM или TPM).
+Пример использования (AWS):
+
+Ты не хранишь ключи в ansible.cfg, а передаёшь IAM-профиль через Jenkins, GitLab Runner или EC2-профиль.
+Плагин подтягивает ключи, и amazon.aws.aws_secret работает автоматически.

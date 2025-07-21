@@ -1,0 +1,32 @@
+Настройка доступа к HashiCorp Vault
+
+Чтобы Ansible действительно мог получить секрет из Vault — ты должен явно настроить соединение. Это можно сделать одним из следующих способов:
+
+Через переменные окружения (удобно для CI и локальной отладки)
+export VAULT_ADDR=https://vault.example.com
+export VAULT_TOKEN=s.abc123456789
+
+Через ansible.cfg (только для изолированных проектов!)
+[defaults]
+vars_plugins_enabled = host_group_vars, hashivault
+
+[hashi_vault]
+url = https://vault.example.com
+auth_method = token
+token = s.abc123456789
+
+Через динамическую авторизацию (рекомендуется для CI/CD)
+AppRole: VAULT_ROLE_ID, VAULT_SECRET_ID
+GitHub OAuth токен
+Kubernetes JWT
+AWS IAM подпись
+
+Более подробно смотри в документации community.hashi_vault.
+
+Почему это важно
+Без подключения ты получишь ошибку:
+
+Failed to connect to Vault...
+Permission denied...
+
+Ansible ничего не "знает" про Vault, пока ты его не настроишь.
